@@ -7,8 +7,33 @@
 #include <iostream>
 
 using namespace cv;
+using namespace std;
+
+void help(int code){
+
+	switch (code) {
+		case 0:
+			cout << "This program detectes people on the camera by the top view."<< endl <<
+			" To use it you need to start the program and specify path to video "<< endl << 
+			"For Example: ./camera ../camera.avi" << endl;	
+			break;
+		case -1:
+			cout << "Wrong number of arguments" << endl;
+		case -2:
+			cerr << "Couldn't open video" << endl;
+			break;
+	}
+	
+
+}
 
 int main (int argc, char *argv[]) {
+
+	help(0);
+	if(argc != 2) {
+		help(-1);
+		return -1;
+	}
 	namedWindow("Camera", WINDOW_AUTOSIZE);
 	namedWindow("Mask", WINDOW_AUTOSIZE);
 
@@ -17,7 +42,7 @@ int main (int argc, char *argv[]) {
 	cap.open(argv[1]);
 	
 	if (!cap.isOpened()) {
-		std::cerr << "Couldn't open video" << std::endl;
+		help(-2);
 		return -1;
 	}
 
