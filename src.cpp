@@ -4,6 +4,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/video.hpp>
 
+#include <stdio.h>
 #include <iostream>
 
 using namespace cv;
@@ -50,22 +51,54 @@ int main (int argc, char *argv[]) {
 	Mat mask;
 	Mat back;
 
-	Ptr<BackgroundSubtractor> p;
+	Ptr<BackgroundSubtractorMOG2> p;
 
-	p = createBackgroundSubtractorMOG2(); 
-	
+	p = createBackgroundSubtractorMOG2(500, 20, false); 
+
 
 	int w = frame.cols;
 	int h = frame.rows;
+
+	cout << "Ratio is" << p->getBackgroundRatio() << endl;
 	
+	p->setBackgroundRatio(1);
 	while (true) {
 		cap >> frame;
 		if (frame.empty()) break;
-		imshow("Camera", frame);
 
 		p->apply(frame, mask, 0.1);
-		imshow("Mask", mask);
+		int k = 0;
+		
+		vector< vector <Point> > contours;
+                vector<Vec4i> hierarchy;	
+		
+		findContours(mask, contours, hierarchy, CV_RETR_EXTERNAL,
+			CV_CHAIN_APPROX_SIMPLE,Point(0,0));
+		vector<vector <Point> > contours_poly(contours.size());
+		
+		for (int i = 0; i < contours.size(); i++) {
+			approxPolyDP(Mat(contours[i]), contours_poly[i],3,true);
+		}
+		vector<Rect> boundRect(contours_poly.size());
+		
+		for (int i = 0; i < contours_poly.size(); i++) {
+			boundRect[i] = boundingRect(contours_poly[i]);
+			int width = boundRect[i].width;
+			int height = boundRect[i].height;
+			if (width >= 50 and height <= 90 ) {
 
+				rectangle(
+					frame,
+				 	boundRect[i].tl(), 	
+					boundRect[i].br(),
+					Scalar(0,0,255),
+					2,8,0);
+			}
+	
+		}	
+		imshow("Mask", mask);
+		imshow("Camera", frame);
+	
 		if ((char) waitKey(33) >= 0 ) break;
 
 		

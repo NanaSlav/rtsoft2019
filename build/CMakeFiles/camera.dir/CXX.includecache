@@ -17,6 +17,8 @@ opencv2/highgui.hpp
 -
 opencv2/video.hpp
 -
+stdio.h
+-
 iostream
 -
 
