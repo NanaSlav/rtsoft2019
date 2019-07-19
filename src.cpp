@@ -39,7 +39,10 @@ int main (int argc, char *argv[]) {
 	namedWindow("Mask", WINDOW_AUTOSIZE);
 
 	VideoCapture cap;
-	
+
+	VideoWriter writer;
+	writer.open( "camera_detect.mp4", CV_FOURCC('M','J','P','G'), 15, Size(640,480) );
+
 	cap.open(argv[1]);
 	
 	if (!cap.isOpened()) {
@@ -95,7 +98,8 @@ int main (int argc, char *argv[]) {
 					2,8,0);
 			}
 	
-		}	
+		}
+		writer << frame;
 		imshow("Mask", mask);
 		imshow("Camera", frame);
 	
@@ -103,5 +107,6 @@ int main (int argc, char *argv[]) {
 
 		
 	}
+	writer.release();
 	return 0;
 }
